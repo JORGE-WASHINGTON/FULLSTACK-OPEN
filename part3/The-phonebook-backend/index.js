@@ -50,23 +50,15 @@ app.get("/info", (request, response) => {
 });
 
 app.get("/api/persons", (request, response) => {
-  response.json(persons);
-});
-
-/* app.get("/api/persons", (request, response) => {
   Contact.find({}).then((contacts) => {
     response.json(contacts);
   });
-}); */
+});
 
 app.get("/api/persons/:id", (request, response) => {
-  const id = Number(request.params.id);
-  const person = persons.find((person) => person.id === id);
-  if (person) {
-    response.send(person);
-  } else {
-    response.status(404).end();
-  }
+  Contact.findById(request.params.id).then((contact) => {
+    response.json(contact);
+  });
 });
 
 app.delete("/api/persons/:id", (request, response) => {
@@ -78,21 +70,12 @@ app.delete("/api/persons/:id", (request, response) => {
 
 app.post("/api/persons", (request, response) => {
   const body = request.body;
+
   if (!body.name) {
     return response.status(400).json({ error: "name missing" });
   }
 
-  const person = {
-    name: body.name,
-    number: body.number,
-    date: new Date(),
-  };
-
-  persons = persons.concat(person);
-
-  response.json(person);
-
-  /* const contact = new Contact({
+  const contact = new Contact({
     name: body.name,
     number: body.number,
     date: new Date(),
@@ -100,7 +83,7 @@ app.post("/api/persons", (request, response) => {
 
   contact.save().then((savedContact) => {
     response.json(savedContact);
-  }); */
+  });
 });
 
 const PORT = process.env.PORT;
