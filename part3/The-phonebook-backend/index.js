@@ -65,7 +65,7 @@ app.get("/api/persons/:id", (request, response, next) => {
 
 //Delete one person
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   Contact.findByIdAndRemove(request.params.id)
     .then((result) => {
       if (result) {
@@ -95,7 +95,7 @@ app.post("/api/persons", (request, response) => {
   });
 
   contact.save().then((savedContact) => {
-    response.status(201).end();
+    response.json(savedContact);
   });
 });
 
