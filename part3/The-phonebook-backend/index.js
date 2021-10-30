@@ -95,7 +95,7 @@ app.post("/api/persons", (request, response) => {
   });
 
   contact.save().then((savedContact) => {
-    response.json(savedContact);
+    response.status(201).end();
   });
 });
 
