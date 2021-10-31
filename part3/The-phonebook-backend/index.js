@@ -26,6 +26,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
@@ -81,12 +83,8 @@ app.delete("/api/persons/:id", (request, response, next) => {
 
 //Add person
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const body = request.body;
-
-  if (!body.name) {
-    return response.status(400).json({ error: "name missing" });
-  }
 
   const contact = new Contact({
     name: body.name,
@@ -94,9 +92,12 @@ app.post("/api/persons", (request, response) => {
     date: new Date(),
   });
 
-  contact.save().then((savedContact) => {
-    response.json(savedContact);
-  });
+  contact
+    .save()
+    .then((savedContact) => {
+      response.json(savedContact);
+    })
+    .catch((error) => next(error));
 });
 
 //Update contact
@@ -108,7 +109,10 @@ app.put("/api/persons/:id", (request, response, next) => {
     number: body.number,
   };
 
-  Contact.findByIdAndUpdate(request.params.id, contact, { new: true })
+  Contact.findByIdAndUpdate(request.params.id, contact, {
+    new: true,
+    runValidators: true,
+  })
     .then((updatedContact) => {
       response.json(updatedContact);
     })
