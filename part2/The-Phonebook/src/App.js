@@ -52,26 +52,34 @@ const App = () => {
           }, 3000);
         })
         .catch((error) => {
-          setNotification(
-            `Information of ${alreadyAdded[0].name} has been removed from server`
-          );
+          if (error.response.status === 400) {
+            setNotification(
+              "Validation error: number must have at least 8 characters"
+            );
+          }
           setTimeout(() => {
             setNotification(null);
           }, 3000);
-          setPersons(
-            persons.filter((person) => person.id !== alreadyAdded[0].id)
-          );
         });
     } else {
-      personService.addContact(personObject).then((newContact) => {
-        setPersons(persons.concat(newContact));
-        setNewName("");
-        setNewNumber("");
-        setNotification(`Added ${personObject.name}`);
-        setTimeout(() => {
-          setNotification(null);
-        }, 3000);
-      });
+      personService
+        .addContact(personObject)
+        .then((newContact) => {
+          setPersons(persons.concat(newContact));
+          setNewName("");
+          setNewNumber("");
+          setNotification(`Added ${personObject.name}`);
+          setTimeout(() => {
+            setNotification(null);
+          }, 3000);
+        })
+        .catch((error) => {
+          setNotification(`${error.response.data.error}`);
+          setTimeout(() => {
+            setNotification(null);
+          }, 3000);
+          console.log(error.response.data.error);
+        });
     }
   };
 
