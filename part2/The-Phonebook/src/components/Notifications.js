@@ -4,7 +4,7 @@ const Notifications = ({ message }) => {
   } else if (
     message.includes("server") ||
     message.includes("removed") ||
-    message.includes("validation")
+    message.includes("Validation")
   ) {
     return <div className="error">{message}</div>;
   }
