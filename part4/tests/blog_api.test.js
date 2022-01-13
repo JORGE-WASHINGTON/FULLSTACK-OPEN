@@ -87,6 +87,38 @@ test("if the title and url properties are missing, respond with 400", async () =
   await api.post("/api/blogs").send(newBlog).expect(400);
 });
 
+//4.13 Blog list expansions, step1
+
+test("a single blog can be deleted", async () => {
+  const blogsAtStart = await helper.blogsInDb();
+  const blogToDelete = notesAtStart[0];
+
+  await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+  const response = await api.get("/api/blogs");
+
+  const titles = response.body.map((blog) => blog.title);
+
+  expect(titles).not.toContain(blogToDelete.title);
+});
+
+//4.14 Blog list expansions, step2
+
+test("a single blog can be updated", async () => {
+  const notesAtStart = await helper.blogsInDb();
+  const blogToUpdate = notesAtStart[0];
+  const updatedBlog = {
+    title: "this blog was updated",
+  };
+
+  await api.put(`/api/blogs/${blogToUpdate.id}`).send(updatedBlog).expect(200);
+
+  const response = await api.get("/api/blogs");
+  const titles = response.body.map((blog) => blog.title);
+  expect(titles).toContain(updatedBlog.title);
+  expect(titles).not.toContain(blogToUpdate.title);
+});
+
 afterAll(() => {
   mongoose.connection.close();
 });
